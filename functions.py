@@ -5,15 +5,16 @@ from copy import deepcopy
 from helper import *
 
 MAX_SIZE = 500
+IMAGE_GENERATION=500
 
-def getImage(path):
+def GetImage(path):
     try:
         target = Image.open(path)
         target.convert("RGB")
         height , width = target.size
-        if height > 500:
+        if height > MAX_SIZE:
             target.resize((MAX_SIZE , width))
-        elif width > 500:
+        elif width > MAX_SIZE:
             target.resize((height , MAX_SIZE))
         else:
             return target
@@ -30,47 +31,11 @@ def foo(img1 , img2):
     sq_sum = np.sum(root_diff)
     return sq_sum, i1.size 
 
-def fitness(img1, img2):
+def Fitness(img1, img2):
     dif, size = foo(img1 , img2 )
     return (dif/255.0*100)/size
 
-def run(target, initial_gens, generation_per_image, pop_per_generation):
-    if not os.path.exists("results"):
-        os.mkdir("results")
-    generation = 1
-    parent = Organism(target.size, initial_gens)
-    score = fitness(parent.drawImage(), target)
-    while True:
-        print("Generation {}-{}".format(generation, score))
-        if generation % generation_per_image == 0:
-            parent.drawImage().save(os.path.join("results", "{}.png".format(generation)))
-        generation += 1
-        children = []
-        scores = []
-        winners = []
-        children.append(parent)
-        scores.append(score)
-
-
-        if len(winners) >= 2:
-            children = groupCrossover([x[0] for x in winners], pop_per_generation - 1)
-
-        try:
-             results = groupMutate(parent, pop_per_generation - 1, target)
-        except KeyboardInterrupt:
-             print("bye")
-             return
-        
-        newScores, newChildren = zip(*results)
-
-        children.extend(newChildren)
-        scores.extend(newScores)
-
-        winners = sorted(zip(children, scores), key=lambda x:x[1])
-        parent, score = winners[0]
-
-
-def groupCrossover(parents, number):
+def Crossover(parents, number):
     results = []
     for _ in range(number):
         parent1 = random.choice(parents)
@@ -80,13 +45,21 @@ def groupCrossover(parents, number):
     return results
 
 
-def groupMutate(parent, number,target):
+def Mutate(parent, number,target):
     results = []
     for _ in range(number):
         chromosomes = deepcopy(parent)
         chromosomes.mutate()
         i1 = chromosomes.drawImage()
         i2 = target
-        fitness_score = fitness(i1, i2)
+        fitness_score = Fitness(i1, i2)
         results.append((fitness_score, chromosomes))
     return results
+
+def GetSave(parent, generation, score):
+    if not os.path.exists("results"):
+        os.mkdir("results")
+
+    print("Generation {}-{}".format(generation, score))
+    if generation % IMAGE_GENERATION == 0 or generation == 100:
+        parent.drawImage().save(os.path.join("results", "{}.png".format(generation)))

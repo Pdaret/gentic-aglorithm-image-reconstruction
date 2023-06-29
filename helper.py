@@ -32,7 +32,7 @@ class Gene:
             self.params = ["diameter", "pos", "color"]
 
         def mutate(self):
-            mutation_size = max(1, int(round(random.gauss(15, 4))))/100
+            # mutation_size = max(1, int(round(random.gauss(15, 4))))/100
             mutation_type = random.choice(self.params)
             if mutation_type == 'diameter':
                 self.diameter = random.randint(2, 10)
@@ -44,7 +44,7 @@ class Gene:
                 self.color = Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
 
-class Organism:
+class Chromosome:
     def __init__(self, size, num):
         self.size = size
         self.genes = [Gene(size) for _ in range(num)]
@@ -66,8 +66,8 @@ class Organism:
     
     def crossover(self, other):
         # Perform uniform crossover between self and other
-        # Create a new organism as the child
-        child = Organism(self.size, 0)
+        # Create a new Chromosome as the child
+        child = Chromosome(self.size, 0)
 
         for i in range(len(self.genes)):
             if random.random() < CROSSOVER_CHANCE:
