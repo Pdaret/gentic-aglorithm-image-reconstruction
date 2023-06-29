@@ -8,6 +8,7 @@ MAX_SIZE = 500
 IMAGE_GENERATION=500
 
 def GetImage(path):
+    # loads and prepares an image from the specified path.
     try:
         target = Image.open(path)
         target.convert("RGB")
@@ -24,6 +25,7 @@ def GetImage(path):
 
 
 def foo(img1 , img2):
+    # calculates the squared sum of the difference between two images.
     i1 = np.array(img1, dtype=np.int16)
     i2 = np.array(img2, dtype=np.int16)
     diff = np.abs(np.square(i1 - i2))
@@ -32,10 +34,12 @@ def foo(img1 , img2):
     return sq_sum, i1.size 
 
 def Fitness(img1, img2):
+    # calculates the fitness score between two images.
     dif, size = foo(img1 , img2 )
     return (dif/255.0*100)/size
 
 def Crossover(parents, number):
+    # performs crossover between a list of parent chromosomes.
     results = []
     for _ in range(number):
         parent1 = random.choice(parents)
@@ -46,6 +50,7 @@ def Crossover(parents, number):
 
 
 def Mutate(parent, number,target):
+    # performs mutation on a parent chromosome.
     results = []
     for _ in range(number):
         chromosomes = deepcopy(parent)
@@ -57,6 +62,7 @@ def Mutate(parent, number,target):
     return results
 
 def GetSave(parent, generation, score):
+    # handles saving the generated images.
     if not os.path.exists("results"):
         os.mkdir("results")
 
